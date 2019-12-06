@@ -37,27 +37,42 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef VDEF_H_INCLUDED
 #include "vdef.h"
-#include "vrt.h"
+#endif
+
+#ifndef VRT_H_INCLUDED
+#include <vrt.h>
+#endif
+
 #include "miniobj.h"
 #include "vas.h"
 #include "vsa.h"
 
 #include "vcc_dns_if.h"
 
+/* Varnish < 6.2 compat */
+#ifndef VENUM
+  #define VENUM(a) vmod_enum_ ## a
+#endif
+
 VCL_STRING
 vmod_resolve(VRT_CTX, VCL_STRING hostname)
 {
 	const struct sockaddr_in *si4;
 	const struct sockaddr_in6 *si6;
-	struct addrinfo *res;
+	struct addrinfo hints, *res;
 	const void *addr;
 	const char *r;
 	int len;
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 
-	if (getaddrinfo(hostname, NULL, NULL, &res))
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+
+	if (getaddrinfo(hostname, NULL, &hints, &res))
 		return (NULL);
 
 	switch (res->ai_family) {
@@ -92,12 +107,16 @@ VCL_STRING
 vmod_rresolve(VRT_CTX, VCL_STRING hostname)
 {
 	char node[NI_MAXHOST];
-	struct addrinfo *res;
+	struct addrinfo hints, *res;
 	const char *p = NULL;
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 
-	if (getaddrinfo(hostname, NULL, NULL, &res))
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+
+	if (getaddrinfo(hostname, NULL, &hints, &res))
 		return (NULL);
 
 	if (!getnameinfo(res->ai_addr, res->ai_addrlen, node,

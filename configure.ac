@@ -1,6 +1,10 @@
 AC_PREREQ(2.68)
 AC_COPYRIGHT([Copyright (c) 2013-2015 Kenneth Shaw, 2018 UPLEX])
-AC_INIT([libvmod-dns], [trunk])
+AC_INIT([libvmod-dns],
+        [trunk],
+        [https://github.com/knq/libvmod-dns/issues],
+        [vmod-dns],
+        [https://github.com/knq/libvmod-dns])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_HEADER([config.h])
@@ -19,12 +23,13 @@ AC_ARG_WITH([rst2man],
 	[RST2MAN="$withval"],
 	AC_CHECK_PROGS(RST2MAN, [rst2man rst2man.py], []))
 
-VARNISH_PREREQ([5.2.0])
+VARNISH_PREREQ([${VARNISH_VERSION:-6.0.0}])
 VARNISH_VMODS([dns])
 
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
+	vmod-dns.spec
 ])
 
 AC_OUTPUT

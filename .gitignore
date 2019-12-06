@@ -5,11 +5,13 @@
 autom4te.cache/
 build-aux/
 m4/
+rpmbuild/
 
 *.la
 *.lo
 *.o
 *.tar.gz
+*.spec
 
 Makefile
 Makefile.in
